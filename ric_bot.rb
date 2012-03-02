@@ -11,21 +11,27 @@ Twitter.configure do |config|
 		config.oauth_token_secret="ZoRVUBGka8YLVup3LTTYeJ5MBx6U0GHSS40lDCQ5io"
 end
 
-num=1
-DMInfo=Twitter.direct_messages(count:1).to_s
+num=10
 
-#抽出した文字列DMInfoの内、"text"=>"の文字列を抽出
-/"text"=>"/ =~DMInfo
-#"text"=>"の後の文字列を抽出
-iDMtext = $'
-#不要な「"}>]」を除く
-DMtext=iDMtext.sub("\"}>]","")
+#botがつぶやく言葉が格納される配列
+words = Array.new(num)
+#ダイレクトメッセージのテキストが格納される配列
+dmArray = Array.new(num-1,nil)
+dmInfo=Twitter.direct_messages(count:num)
+
+dmInfo.each do |dm|
+		#dmArray先頭にdm.textを格納していく
+		dmArray.unshift(dm.text)
+		puts dm.text
+end
+
+dmArray.each do |da|
 
 #DMtextを(半角OR全角)スペースまたは,ごとに分割し、各変数に格納
-sub = DMtext.split(/\s|　|,/)[0]
-dl = DMtext.split(/\s|　|,/)[1]
-week = DMtext.split(/\s|　|,/)[2]
-con =  DMtext.split(/\s|　|,/)[3]
+sub = da.split(/\s|　|,/)[0]
+dl = da.split(/\s|　|,/)[1]
+week = da.split(/\s|　|,/)[2]
+con =  da.split(/\s|　|,/)[3]
 
 #dlを日時と時間に分ける
 s = dl.unpack("a2"*(dl.length/2)) 
@@ -45,13 +51,19 @@ days = (dlday - nowday).divmod(24*60*60)
 hours = days[1].divmod(60*60) 
 mins = hours[1].divmod(60) 
 
+end
 #残り時間整形
 deadline = "#{days[0].to_i} 日 #{hours[0].to_i} 時間 #{mins[0].to_i} 分 " 
 
 #実際にbotがつぶやく文章を整形
-Word="教科名: " + sub + "     締切日: " + d_month + "月" + d_date + "日" + "(" + week + ")" +
-	 "    内容: " + con + "     締切まであと" + deadline.to_s + "です。" 
+		dmArray.unshift(dm.text)
+words.unshift("教科名: " + sub + "     締切日: " + d_month + "月" + d_date + "日" + "(" + week + ")" +
+"    内容: " + con + "     締切まであと" + deadline.to_s + "です。") 
 
-#Wordを呟く
-Twitter.update(Word)
-
+#Wordsに格納された配列を呟く
+words.echo do |word|
+	if (days[0] <= 0) then
+	puts word
+	#Twitter.update(word)
+	end
+end
