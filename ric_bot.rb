@@ -25,6 +25,7 @@ dmInfo.each do |dm|
 	#puts dm.text
 end
 
+
 dmArray.each do |da|
 #DMtextを(半角OR全角)スペースまたは,ごとに分割し、各変数に格納
 sub = da.split(/\s|　|,/)[0]
@@ -53,18 +54,18 @@ mins = hours[1].divmod(60)
 
 #もし締切りが過ぎていなかったら
 	if (days[0].to_i >= 0) then
-	#残り時間整形
-	deadline = "#{days[0].to_i} 日 #{hours[0].to_i} 時間 #{mins[0].to_i} 分 " 
 
+		#残り時間整形
+	deadline = "#{days[0].to_i} 日 #{hours[0].to_i} 時間 #{mins[0].to_i} 分 " 
 #wordsに整形した文字列を格納
 words.unshift("教科名: " + sub + "     締切日: " + d_month + "月" + d_date + "日" + "(" + week + ")" +
 "    内容: " + con + "     締切まであと" + deadline.to_s + "です。") 
-end
+	end
 
+end
 #wordsの中の要素をつぶやく
 words.each do |word|
 	Twitter.update(word)
 end
 
 
-end
